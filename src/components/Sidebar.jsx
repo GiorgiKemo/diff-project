@@ -4,6 +4,7 @@ import enagramLogo from "/ძირითადი-ლოგო-ai 1.png";
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState(null);
 
   const menuItems = [
     {
@@ -77,16 +78,12 @@ export default function Sidebar() {
         </button>
       )}
 
-      <div className="flex items-center gap-[11px] pl-6 pt-11.25 pb-8">
+      <div className="flex items-center gap-2 pl-6 pt-11.25 pb-8">
         <div
-          className={`shrink-0 overflow-hidden ${collapsed && !isOverlay ? "w-8 h-8" : ""}`}
-          style={collapsed && !isOverlay ? {} : { width: '42.65px', height: '44px' }}
+          className="shrink-0 overflow-hidden"
+          style={collapsed && !isOverlay ? { width: "32px", height: "32px" } : { width: "42.65px", height: "44px" }}
         >
-          <img
-            src={enagramLogo}
-            alt="Enagram"
-            className="w-full h-auto"
-          />
+          <img src={enagramLogo} alt="Enagram" style={{ width: "42.65px", height: "44px" }} />
         </div>
         {(!collapsed || isOverlay) && (
           <span className="text-white font-bold text-sm tracking-[0.2em] uppercase">
@@ -96,51 +93,65 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-7 overflow-visible pt-4.75">
-        {menuItems.map((item) => (
-          <a
-            key={item.id}
-            href="#"
-            onClick={(e) => e.preventDefault()}
-            className={`flex items-center gap-2.25 text-sm transition-colors relative
-              ${
-                item.active
-                  ? "bg-white text-[#132450] font-bold rounded-tl-[30px] rounded-bl-[30px] rounded-r-none ml-[12.8px] -mr-1 pl-[11.2px] pr-4 h-13 z-10"
-                  : "text-white hover:bg-[#2F4273] rounded-lg mx-3 px-3 h-13"
-              }
-              ${collapsed && !isOverlay ? "justify-center mx-2 px-2 w-auto" : ""}`}
-          >
-            {/* Inverse border-radius notches for active tab effect */}
-            {item.active && (
-              <>
-                <div
-                  className="absolute right-0.5 w-4 h-2.5"
-                  style={{
-                    bottom: 'calc(100% - 1px)',
-                    background: 'radial-gradient(15px 10px at 0 0, transparent 98%, white 102%)',
-                  }}
-                />
-                <div
-                  className="absolute right-0.5 w-4 h-2.5"
-                  style={{
-                    top: 'calc(100% - 1px)',
-                    background: 'radial-gradient(15px 10px at 0 100%, transparent 98%, white 102%)',
-                  }}
-                />
-              </>
-            )}
-            <span className="w-6 h-6 shrink-0 flex items-center justify-center">
-              {item.active ? item.activeIcon || item.icon : item.icon}
-            </span>
-            {(isOverlay || !collapsed) && (
-              <span className="truncate">{item.label}</span>
-            )}
-          </a>
-        ))}
+        {menuItems.map((item) => {
+          const isHovered = hoveredItem === item.id;
+          const showFullWidth = !collapsed || isOverlay;
+          const showHoverStyle = isHovered && showFullWidth && !item.active;
+          const notchColor = item.active ? "white" : "#2F4273";
+          const showNotches = (item.active || showHoverStyle) && showFullWidth;
+
+          let itemClass;
+          if (item.active) {
+            itemClass = "bg-white text-[#132450] font-bold rounded-tl-[30px] rounded-bl-[30px] rounded-r-none ml-[12.8px] -mr-1 pl-[11.2px] pr-4 h-13 z-10";
+          } else if (showHoverStyle) {
+            itemClass = "bg-[#2F4273] text-white rounded-tl-[30px] rounded-bl-[30px] rounded-r-none ml-[12.8px] -mr-1 pl-[11.2px] pr-4 h-13 z-10";
+          } else if (collapsed && !isOverlay) {
+            itemClass = "text-white hover:bg-[#2F4273] rounded-lg mx-2 px-2 h-13 justify-center";
+          } else {
+            itemClass = "text-white ml-[12.8px] -mr-1 pl-[11.2px] pr-4 h-13";
+          }
+
+          return (
+            <a
+              key={item.id}
+              href="#"
+              onClick={(e) => e.preventDefault()}
+              onMouseEnter={() => setHoveredItem(item.id)}
+              onMouseLeave={() => setHoveredItem(null)}
+              className={`flex items-center gap-2.25 text-sm transition-colors relative ${itemClass}`}
+            >
+              {showNotches && (
+                <>
+                  <div
+                    className="absolute right-0.5 w-4 h-2.5"
+                    style={{
+                      bottom: "calc(100% - 1px)",
+                      background: `radial-gradient(15px 10px at 0 0, transparent 98%, ${notchColor} 102%)`,
+                    }}
+                  />
+                  <div
+                    className="absolute right-0.5 w-4 h-2.5"
+                    style={{
+                      top: "calc(100% - 1px)",
+                      background: `radial-gradient(15px 10px at 0 100%, transparent 98%, ${notchColor} 102%)`,
+                    }}
+                  />
+                </>
+              )}
+              <span className="w-6 h-6 shrink-0 flex items-center justify-center">
+                {item.active ? item.activeIcon || item.icon : item.icon}
+              </span>
+              {(isOverlay || !collapsed) && (
+                <span className="truncate">{item.label}</span>
+              )}
+            </a>
+          );
+        })}
       </nav>
 
       <div className="border-t border-[rgba(158,185,255,0.2)] mx-4 pt-4 pb-5">
-        <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded-full bg-[#9EC8FF] border border-white flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-1.5">
+          <div className="w-5 h-5 rounded-full bg-[#9EC8FF] border border-white flex items-center justify-center shrink-0">
             <span className="text-[#132450] text-[7px] font-bold leading-none">
               თო
             </span>
