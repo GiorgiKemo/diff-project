@@ -2,7 +2,7 @@
 
 const languages = ['ქართული', 'English', 'Русский'];
 
-export default function Toolbar() {
+export default function Toolbar({ hasDiffs = false }) {
   const [selectedLang, setSelectedLang] = useState('ქართული');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [formatChecked, setFormatChecked] = useState(false);
@@ -78,9 +78,9 @@ export default function Toolbar() {
 
       <button
         onClick={(e) => e.preventDefault()}
-        className="flex items-center justify-center gap-1.5 px-4 py-2.5
-                   bg-[#4361EE] hover:bg-[#3B54D4] text-white text-sm rounded-md
-                   cursor-pointer select-none sm:w-auto"
+        disabled={!hasDiffs}
+        className={`flex items-center justify-center gap-1.5 px-4 py-2.5 text-white text-sm rounded-md select-none sm:w-auto
+          ${hasDiffs ? 'bg-[#4361EE] hover:bg-[#3B54D4] cursor-pointer' : 'bg-[rgba(56,58,72,0.6)] cursor-not-allowed'}`}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="9" strokeWidth={1.5} />

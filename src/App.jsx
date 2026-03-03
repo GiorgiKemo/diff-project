@@ -3,6 +3,7 @@ import DiffMatchPatch from 'diff-match-patch';
 import Sidebar from './components/Sidebar';
 import Toolbar from './components/Toolbar';
 import TextInput from './components/TextInput';
+import ProgressBar from './components/ProgressBar';
 
 const dmp = new DiffMatchPatch();
 
@@ -10,11 +11,16 @@ function App() {
   const [textA, setTextA] = useState('');
   const [textB, setTextB] = useState('');
   const [diffs, setDiffs] = useState(null);
+  const [isComparing, setIsComparing] = useState(false);
 
   const handleCompare = useCallback(() => {
-    const result = dmp.diff_main(textA, textB);
-    dmp.diff_cleanupSemantic(result);
-    setDiffs(result);
+    setIsComparing(true);
+    setTimeout(() => {
+      const result = dmp.diff_main(textA, textB);
+      dmp.diff_cleanupSemantic(result);
+      setDiffs(result);
+      setIsComparing(false);
+    }, 1500);
   }, [textA, textB]);
 
   const handleTextAChange = useCallback(
@@ -66,40 +72,44 @@ function App() {
         <div className="h-22 lg:hidden shrink-0" />
 
         <div className="flex-1 flex flex-col gap-4 p-4 sm:p-6 lg:p-8">
-          <Toolbar />
+          <Toolbar hasDiffs={diffs !== null} />
 
           <hr className="border-[#EDEDED]" />
 
-          <div className="flex flex-col lg:flex-row items-stretch gap-2.5 flex-1 min-h-0">
-            <div className="flex-1 min-h-55 lg:min-h-0">
-              <TextInput
-                label="Source Text A"
-                value={textA}
-                onChange={handleTextAChange}
-                placeholder="დაიწყე წერა..."
-                diffSegments={sourceDiffSegments}
-              />
-            </div>
+          {isComparing ? (
+            <ProgressBar />
+          ) : (
+            <div className="flex flex-col lg:flex-row items-stretch gap-2.5 flex-1 min-h-0">
+              <div className="flex-1 min-h-55 lg:min-h-0">
+                <TextInput
+                  label="Source Text A"
+                  value={textA}
+                  onChange={handleTextAChange}
+                  placeholder="დაიწყე წერა..."
+                  diffSegments={sourceDiffSegments}
+                />
+              </div>
 
-            <div className="flex items-center justify-center py-1 lg:py-0 lg:px-1 shrink-0">
-              <svg className="w-6 h-6 text-[#323232] lg:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4" />
-              </svg>
-              <svg className="w-8 h-8 text-[#323232] hidden lg:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4" />
-              </svg>
-            </div>
+              <div className="flex items-center justify-center py-1 lg:py-0 lg:px-1 shrink-0">
+                <svg className="w-6 h-6 text-[#323232] lg:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4" />
+                </svg>
+                <svg className="w-8 h-8 text-[#323232] hidden lg:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4" />
+                </svg>
+              </div>
 
-            <div className="flex-1 min-h-55 lg:min-h-0">
-              <TextInput
-                label="Target Text B"
-                value={textB}
-                onChange={handleTextBChange}
-                placeholder="დაიწყე წერა..."
-                diffSegments={targetDiffSegments}
-              />
+              <div className="flex-1 min-h-55 lg:min-h-0">
+                <TextInput
+                  label="Target Text B"
+                  value={textB}
+                  onChange={handleTextBChange}
+                  placeholder="დაიწყე წერა..."
+                  diffSegments={targetDiffSegments}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="flex items-center justify-center py-3">
             <button
